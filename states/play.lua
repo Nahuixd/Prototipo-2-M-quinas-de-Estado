@@ -44,6 +44,8 @@ function Play:enter(cantJugadores)
     -- ============================================
     self.coins = {}
     self:generarMonedas(30, cx, cy)
+
+    audio.playMusic("assets/play.ogg") --Musica de juego
 end
 
 function Play:generarMonedas(cantidad, cx, cy)

@@ -3,6 +3,8 @@ local GameOver = {}
 function GameOver:enter(jugadores)
     self.jugadores = jugadores
     self.t = 0
+
+    audio.playMusic("assets/gameover.wav")   -- 🎵 NUEVO: música de fin
 end
 
 function GameOver:update(dt)
@@ -11,8 +13,11 @@ end
 
 function GameOver:keypressed(key)
     if key == "return" or key == "space" then
+        audio.playSFX("select", 0.1)               -- 🎵 NUEVO
         self.machine:switch("menu")
+
     elseif key == "r" then
+        audio.playSFX("select", 0.1)               -- 🎵 NUEVO
         self.machine:switch("play", #self.jugadores)
     end
 end
@@ -33,6 +38,8 @@ function GameOver:draw()
     love.graphics.setColor(1, 0.85, 0.2)
     love.graphics.printf("ENTER para volver al menú · R para reintentar",
         0, h - 60, w, "center")
+
+    love.graphics.setColor(1, 1, 1)
 end
 
 return GameOver

@@ -12,7 +12,8 @@
     "DEBUG",
     "machine",
     "IMG_PLAYER",
-    "IMG_COIN"
+    "IMG_COIN",
+    "audio"
   ],
   "diagnostics.disable": [
     "lowercase-global"
