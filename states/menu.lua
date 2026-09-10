@@ -9,14 +9,7 @@ function Menu:enter()
     }
     self.seleccion = 1
 
-    audio.playMusic("assets/menu.ogg")   -- 🎵 NUEVO: música de menú
-end
-
-function Menu:leave()
-    -- 🎵 NUEVO: (opcional) si querés que la música de menú se corte
-    -- al salir, descomentá la línea de abajo. Si no, sigue sonando
-    -- hasta que el siguiente estado ponga la suya.
-    -- audio.stopMusic()
+    audio.playMusic("assets/menu.wav")           -- 🎵 música de menú
 end
 
 function Menu:update(dt)
@@ -27,15 +20,15 @@ function Menu:keypressed(key)
     if key == "up" or key == "w" then
         self.seleccion = self.seleccion - 1
         if self.seleccion < 1 then self.seleccion = #self.opciones end
-        audio.playSFX("select", 0.05)          -- 🎵 NUEVO: blip al mover
+        audio.playSFX("select", 0.05)
 
     elseif key == "down" or key == "s" then
         self.seleccion = self.seleccion + 1
         if self.seleccion > #self.opciones then self.seleccion = 1 end
-        audio.playSFX("select", 0.05)          -- 🎵 NUEVO: blip al mover
+        audio.playSFX("select", 0.05)
 
     elseif key == "return" or key == "space" then
-        audio.playSFX("select", 0.1)           -- 🎵 NUEVO: blip al confirmar
+        audio.playSFX("select", 0.1)
         local accion = self.opciones[self.seleccion].accion
         if accion == "play1" then
             self.machine:switch("play", 1)
@@ -67,7 +60,6 @@ function Menu:draw()
     love.graphics.printf("↑↓ para mover · ENTER para elegir",
         0, h - 60, w, "center")
 
-    -- 🎵 NUEVO: leyenda de controles de audio
     love.graphics.setColor(0.7, 0.7, 0.7)
     love.graphics.printf("M: mute · +/-: volumen",
         0, h - 30, w, "center")

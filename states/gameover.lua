@@ -4,7 +4,7 @@ function GameOver:enter(jugadores)
     self.jugadores = jugadores
     self.t = 0
 
-    audio.playMusic("assets/gameover.wav")   -- 🎵 NUEVO: música de fin
+    audio.playMusic("assets/gameover.wav")       -- 🎵 música de fin
 end
 
 function GameOver:update(dt)
@@ -13,11 +13,11 @@ end
 
 function GameOver:keypressed(key)
     if key == "return" or key == "space" then
-        audio.playSFX("select", 0.1)               -- 🎵 NUEVO
+        audio.playSFX("select", 0.1)
         self.machine:switch("menu")
 
     elseif key == "r" then
-        audio.playSFX("select", 0.1)               -- 🎵 NUEVO
+        audio.playSFX("select", 0.1)
         self.machine:switch("play", #self.jugadores)
     end
 end

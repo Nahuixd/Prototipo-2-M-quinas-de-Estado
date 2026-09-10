@@ -9,13 +9,13 @@ function Pause:enter(playState)
         { texto = "Menú",      accion = "menu" },
     }
 
-    -- 🎵 NUEVO: bajar música al 20% para sensación de "pausa"
+    -- Bajar música al 20% para sensación de pausa
     self.volumenPrevio = audio.musicVolume
-    audio.setMusicVolume(0.6)
+    audio.setMusicVolume(0.2)
 end
 
 function Pause:leave()
-    -- 🎵 NUEVO: restaurar volumen al salir de pausa
+    -- Restaurar volumen al salir
     audio.setMusicVolume(self.volumenPrevio or 0.6)
 end
 
@@ -23,19 +23,19 @@ function Pause:keypressed(key)
     if key == "up" or key == "w" then
         self.seleccion = self.seleccion - 1
         if self.seleccion < 1 then self.seleccion = #self.opciones end
-        audio.playSFX("select", 0.05)          -- 🎵 NUEVO
+        audio.playSFX("select", 0.05)
 
     elseif key == "down" or key == "s" then
         self.seleccion = self.seleccion + 1
         if self.seleccion > #self.opciones then self.seleccion = 1 end
-        audio.playSFX("select", 0.05)          -- 🎵 NUEVO
+        audio.playSFX("select", 0.05)
 
     elseif key == "escape" then
-        audio.playSFX("select", 0.05)          -- 🎵 NUEVO
+        audio.playSFX("select", 0.05)
         self.machine:switch("play", self.play.cantJugadores)
 
     elseif key == "return" then
-        audio.playSFX("select", 0.1)           -- 🎵 NUEVO
+        audio.playSFX("select", 0.1)
         local accion = self.opciones[self.seleccion].accion
         if accion == "resume" then
             self.machine:switch("play", self.play.cantJugadores)
@@ -48,7 +48,6 @@ function Pause:keypressed(key)
 end
 
 function Pause:draw()
-    -- Dibujamos el juego congelado de fondo
     if self.play then self.play:draw() end
 
     local w, h = love.graphics.getDimensions()

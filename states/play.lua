@@ -27,7 +27,7 @@ function Play:enter(cantJugadores)
             { up = "up", down = "down", left = "left", right = "right" })
     end
 
-    -- Cámara por jugador (una cámara por cada mitad de pantalla)
+    -- Cámara por jugador
     self.camaras = {}
     local w, h = love.graphics.getDimensions()
     local mitadW = (self.cantJugadores == 2) and (w / 2) or w
@@ -39,20 +39,17 @@ function Play:enter(cantJugadores)
     -- Lienzo para la pantalla dividida
     self.canvas = love.graphics.newCanvas(mitadW, h)
 
-    -- ============================================
-    --  GENERACIÓN PROCEDURAL DE MONEDAS
-    -- ============================================
+    -- Generación procedural de monedas
     self.coins = {}
     self:generarMonedas(30, cx, cy)
 
-    audio.playMusic("assets/play.ogg") --Musica de juego
+    audio.playMusic("assets/play.wav")           -- 🎵 música de juego
 end
 
 function Play:generarMonedas(cantidad, cx, cy)
-    -- gen.scatter devuelve puntos sin superponerse
     local puntos = gen.scatter(cantidad, {
-        radius    = 480,
-        minDist   = 44,
+        radius      = 480,
+        minDist     = 44,
         maxIntentos = 40,
     })
 
@@ -66,7 +63,6 @@ function Play:generarMonedas(cantidad, cx, cy)
 end
 
 function Play:leave()
-    -- Limpieza por si volvemos al menú y queremos liberar memoria
     self.coins     = nil
     self.jugadores = nil
     self.camaras   = nil
@@ -76,7 +72,7 @@ end
 function Play:update(dt)
     for _, p in ipairs(self.jugadores) do p:update(dt) end
     for _, c in ipairs(self.camaras)   do c:follow(self.jugadores[1], dt) end
-    for i, c in ipairs(self.camaras)   do c:update(dt) end
+    for _, c in ipairs(self.camaras)   do c:update(dt) end
 
     -- Colisiones jugador ↔ moneda
     for i = #self.coins, 1, -1 do
@@ -88,24 +84,22 @@ function Play:update(dt)
                 p.score = p.score + 1
                 p.size  = p.size + 1
                 self.camaras[1]:shake(0.2, 4)
+                audio.playSFX("coin", 0.15)      -- 🎵 sonido de moneda
                 break
             end
         end
     end
 
-    -- Fin de partida: se acabaron las monedas
+    -- Fin de partida
     if #self.coins == 0 then
         self.machine:switch("gameover", self.jugadores)
     end
 end
 
--- Dibuja el mundo visto por una cámara
 function Play:drawMundo(camara, foco)
     camara:attach()
-
     for _, c in ipairs(self.coins) do c:draw(self.debug) end
     for _, p in ipairs(self.jugadores) do p:draw(self.debug) end
-
     camara:detach()
 end
 
@@ -113,11 +107,9 @@ function Play:draw()
     local w, h = love.graphics.getDimensions()
 
     if self.cantJugadores == 1 then
-        -- Un solo jugador: cámara en pantalla completa
         self:drawMundo(self.camaras[1], self.jugadores[1])
         self:drawHUD(self.jugadores[1], 10, 10)
     else
-        -- Pantalla dividida: mismo canvas, dibujado 2 veces
         local mitadW = w / 2
 
         love.graphics.setCanvas(self.canvas)
@@ -132,7 +124,6 @@ function Play:draw()
         love.graphics.setCanvas()
         love.graphics.draw(self.canvas, mitadW, 0)
 
-        -- Línea separadora
         love.graphics.setColor(1, 1, 1)
         love.graphics.line(mitadW, 0, mitadW, h)
 

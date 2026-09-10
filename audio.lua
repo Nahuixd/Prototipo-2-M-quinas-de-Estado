@@ -31,12 +31,12 @@ local function cargarSource(ruta, tipo)
 end
 
 -- Carga todos los SFX al inicio
-function audio.load()
-    audio.sfx.coin   = cargarSource("assets/coin.wav",   "static")
-    audio.sfx.select = cargarSource("assets/select.wav",   "static")
-    audio.sfx.hit    = cargarSource("assets/hit.wav",    "static")
 
-    -- Volumen inicial
+ function audio.load()
+    audio.sfx.coin   = cargarSource("assets/coin.wav",   "static")
+    audio.sfx.select = cargarSource("assets/select.wav", "static")
+    -- audio.sfx.hit 
+
     for _, s in pairs(audio.sfx) do
         if s then s:setVolume(audio.sfxVolume) end
     end
