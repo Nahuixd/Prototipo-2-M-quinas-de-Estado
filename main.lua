@@ -39,8 +39,9 @@ function love.load()
     love.graphics.setBackgroundColor(0.08, 0.09, 0.12)
     love.math.setRandomSeed(os.time())
 
-    _G.IMG_PLAYER = cargarImagen("assets/player.png", 0.35, 0.75, 1.0, 32, 32)
-    _G.IMG_COIN   = cargarImagen("assets/coin.png",   1.0,  0.85, 0.2, 20, 20)
+    _G.IMG_PLAYER1 = cargarImagen("assets/frog.png",  0.35, 0.75, 1.0, 32, 32)   -- 🐸 Jugador 1
+_G.IMG_PLAYER2 = cargarImagen("assets/mouse.png", 0.9,  0.5,  0.3, 32, 32)   -- 🐭 Jugador 2
+_G.IMG_COIN    = cargarImagen("assets/coin.png",  1.0,  0.85, 0.2, 20, 20)   -- 🪙 Moneda
 
     audio.load()                               -- 🎵 NUEVO: cargar SFX
 

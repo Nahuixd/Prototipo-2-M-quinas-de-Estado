@@ -1,8 +1,8 @@
 function love.conf(t)
-    t.identity = "mi_juego"
+    t.identity = "maquinas_de_estado_prog2"     -- 🆕 carpeta de guardado (sin espacios)
     t.version  = "11.4"
 
-    t.window.title     = "Mi Maquinola Game"
+    t.window.title     = "Maquinas De Estado Programacion 2"   -- 🆕 título de la ventana
     t.window.width     = 800
     t.window.height    = 600
     t.window.resizable = false

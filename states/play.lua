@@ -2,10 +2,24 @@ local Player = require("player")
 local Coin   = require("coin")
 local gen    = require("gen")
 
+-- ============================================================
+--  🎨 AJUSTÁ ACÁ LA ESCALA DE CADA COSA
+--  1.0 = tamaño original · 0.5 = mitad · 2.0 = doble
+-- ============================================================
+local ESCALA_JUGADOR = 0.5    -- frog y mouse
+local ESCALA_MONEDA  = 0.3    -- coin
+
 local Play = {}
 
 -- cantJugadores: 1 o 2
 function Play:enter(cantJugadores)
+    -- 🆕 Si ya hay una partida en curso con los mismos jugadores,
+    -- estamos volviendo de pausa → NO reiniciar todo
+    if self.camaras and self.cantJugadores == cantJugadores then
+        audio.playMusic("assets/play.wav")
+        return
+    end
+
     self.cantJugadores = cantJugadores or 1
     self.debug         = false
 
@@ -13,18 +27,23 @@ function Play:enter(cantJugadores)
     self.world = { w = 1600, h = 1200 }
 
     -- Imágenes (main.lua las dejó en _G vía love.load)
-    self.imgJugador = _G.IMG_PLAYER
-    self.imgMoneda  = _G.IMG_COIN
+    self.imgJugador1 = _G.IMG_PLAYER1      -- 🐸 frog
+    self.imgJugador2 = _G.IMG_PLAYER2      -- 🐭 mouse
+    self.imgMoneda   = _G.IMG_COIN         -- 🪙 coin
 
     -- Jugadores
     local cx, cy = self.world.w / 2, self.world.h / 2
     self.jugadores = {}
-    self.jugadores[1] = Player.new(cx - 100, cy, self.imgJugador,
-        { up = "w", down = "s", left = "a", right = "d" })
+    self.jugadores[1] = Player.new(cx - 100, cy, self.imgJugador1,
+        { up = "w", down = "s", left = "a", right = "d" },
+        ESCALA_JUGADOR)
+    self.jugadores[1].size = 20 * ESCALA_JUGADOR
 
     if self.cantJugadores == 2 then
-        self.jugadores[2] = Player.new(cx + 100, cy, self.imgJugador,
-            { up = "up", down = "down", left = "left", right = "right" })
+        self.jugadores[2] = Player.new(cx + 100, cy, self.imgJugador2,
+            { up = "up", down = "down", left = "left", right = "right" },
+            ESCALA_JUGADOR)
+        self.jugadores[2].size = 20 * ESCALA_JUGADOR
     end
 
     -- Cámara por jugador
@@ -54,37 +73,57 @@ function Play:generarMonedas(cantidad, cx, cy)
     })
 
     for _, p in ipairs(puntos) do
-        self.coins[#self.coins + 1] = Coin.new(
+        local c = Coin.new(
             cx + p.x,
             cy + p.y,
-            self.imgMoneda
+            self.imgMoneda,
+            ESCALA_MONEDA
         )
+        c.size = 10 * ESCALA_MONEDA
+        self.coins[#self.coins + 1] = c
     end
 end
 
+-- ⚠️ OJO: leave() NO borra nada. Pause:draw() necesita el estado
+-- intacto para dibujar el juego pausado de fondo.
 function Play:leave()
-    self.coins     = nil
-    self.jugadores = nil
-    self.camaras   = nil
-    self.canvas    = nil
+    -- (intencionalmente vacío)
+end
+
+-- Limpieza REAL. Se llama desde Pause cuando el jugador elige
+-- "Reiniciar" o "Menú", o al volver al menú principal.
+function Play:reset()
+    self.coins         = nil
+    self.jugadores     = nil
+    self.camaras       = nil
+    self.canvas        = nil
+    self.cantJugadores = nil
+    self.imgJugador1   = nil
+    self.imgJugador2   = nil
+    self.imgMoneda     = nil
+    self.world         = nil
 end
 
 function Play:update(dt)
     for _, p in ipairs(self.jugadores) do p:update(dt) end
-    for _, c in ipairs(self.camaras)   do c:follow(self.jugadores[1], dt) end
-    for _, c in ipairs(self.camaras)   do c:update(dt) end
+
+    -- Cada cámara sigue a su jugador correspondiente
+    for i, c in ipairs(self.camaras) do
+        c:follow(self.jugadores[i], dt)
+    end
+    for _, c in ipairs(self.camaras) do c:update(dt) end
 
     -- Colisiones jugador ↔ moneda
     for i = #self.coins, 1, -1 do
         local c = self.coins[i]
         c:update(dt)
-        for _, p in ipairs(self.jugadores) do
+        for j, p in ipairs(self.jugadores) do
             if p:collidesWith(c) then
                 table.remove(self.coins, i)
                 p.score = p.score + 1
                 p.size  = p.size + 1
-                self.camaras[1]:shake(0.2, 4)
-                audio.playSFX("coin", 0.15)      -- 🎵 sonido de moneda
+                self.camaras[j]:shake(0.2, 4)        -- shake en SU cámara
+                audio.playSFX("coin", 0.15)
                 break
             end
         end
@@ -124,6 +163,7 @@ function Play:draw()
         love.graphics.setCanvas()
         love.graphics.draw(self.canvas, mitadW, 0)
 
+        -- Línea divisoria
         love.graphics.setColor(1, 1, 1)
         love.graphics.line(mitadW, 0, mitadW, h)
 

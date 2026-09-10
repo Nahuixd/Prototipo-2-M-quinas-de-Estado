@@ -1,14 +1,16 @@
 local Player = {}
 Player.__index = Player
 
--- keys: { up="w", down="s", left="a", right="d" }
-function Player.new(x, y, image, keys)
+-- keys:  { up="w", down="s", left="a", right="d" }
+-- scale: 1 = tamaño original, 0.5 = mitad, 2 = doble
+function Player.new(x, y, image, keys, scale)
     local self = setmetatable({}, Player)
     self.x, self.y   = x, y
-    self.size        = 20
+    self.size        = 20                       -- radio de colisión base
     self.speed       = 260
     self.image       = image
     self.keys        = keys
+    self.scale       = scale or 1               -- 🎨 escala visual
     self.score       = 0
     return self
 end
@@ -38,7 +40,9 @@ end
 
 function Player:draw(showDebug)
     local w, h = self.image:getWidth(), self.image:getHeight()
-    love.graphics.draw(self.image, self.x, self.y, 0, 1, 1, w / 2, h / 2)
+    love.graphics.draw(self.image, self.x, self.y, 0,
+        self.scale, self.scale,           -- 🎨 escala X, escala Y
+        w / 2, h / 2)                     -- origen al centro
     if showDebug then
         love.graphics.circle("line", self.x, self.y, self.size)
     end
